@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+/usr/bin/ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+
 # Install command-line tools using Homebrew.
 
 # Make sure we’re using the latest Homebrew.
@@ -21,8 +23,39 @@ brew install gnu-sed --with-default-names
 # Install Bash 4.
 # Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before
 # running `chsh`.
+curl -L git.io/antigen > antigen.zsh
 brew install bash
 brew install bash-completion2
+brew install zsh zsh-completions
+cd ~ && git clone https://github.com/zsh-users/antigen.git .antigen
+sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
+brew cask install spectacle
+brew install tmux
+gem install tmuxinator
+brew install mr
+brew cask install sublime-text
+brew cask install virtualbox
+brew install docker
+brew cask install docker
+brew cask install spotify
+brew cask install caffeine
+brew cask install tunnelblick
+brew cask install the-unarchiver
+brew install htop
+brew cask install istat-menus
+brew cask install iterm2
+
+# Code
+brew install python
+sudo easy_install pip
+sudo pip install --upgrade pip
+
+curl -L https://get.rvm.io | bash -s stable --rails --autolibs=enabled
+
+
+# Finder settings
+defaults write com.apple.finder AppleShowAllFiles YES
+
 
 # Switch to using brew-installed bash as default shell
 if ! fgrep -q '/usr/local/bin/bash' /etc/shells; then
@@ -92,6 +125,10 @@ brew install ssh-copy-id
 brew install tree
 brew install vbindiff
 brew install zopfli
+brew install htop
 
 # Remove outdated versions from the cellar.
 brew cleanup
+
+# Fonts
+cd; mkdir code; cd code; git clone https://github.com/powerline/fonts.git; cd fonts; ./install.sh; cd
