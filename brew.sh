@@ -44,11 +44,14 @@ brew cask install the-unarchiver
 brew install htop
 brew cask install istat-menus
 brew cask install iterm2
+brew install telnet
 
 # Code
 brew install python
+brew install python3
 sudo easy_install pip
 sudo pip install --upgrade pip
+pip3 install --upgrade pip setuptools wheel
 
 curl -L https://get.rvm.io | bash -s stable --rails --autolibs=enabled
 
