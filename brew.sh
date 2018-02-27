@@ -14,6 +14,10 @@ brew upgrade
 # Don’t forget to add `$(brew --prefix coreutils)/libexec/gnubin` to `$PATH`.
 brew install coreutils
 
+# Misc Work
+brew install terraform
+brew install awscli
+
 # Install some other useful utilities like `sponge`.
 brew install moreutils
 # Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed.
@@ -32,6 +36,7 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/mas
 brew cask install spectacle
 brew install tmux
 gem install tmuxinator
+brew install reattach-to-user-namespace
 brew install mr
 brew cask install sublime-text
 brew cask install virtualbox
@@ -52,6 +57,7 @@ brew install python3
 sudo easy_install pip
 sudo pip install --upgrade pip
 pip3 install --upgrade pip setuptools wheel
+pip3 install virtualenv virtualenvwrapper
 
 curl -L https://get.rvm.io | bash -s stable --rails --autolibs=enabled
 
