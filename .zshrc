@@ -79,7 +79,7 @@ syspip(){
    PIP_REQUIRE_VIRTUALENV="" pip "$@"
 }
 
-#source /usr/local/bin/virtualenvwrapper.sh
+source /usr/local/bin/virtualenvwrapper.sh
 alias v='workon'
 alias v.deactivate='deactivate'
 alias v.mk='mkvirtualenv'
@@ -511,6 +511,10 @@ autoload zmv
 
 # Add RVM and Pyenv to PATH for scripting. Make sure this is the last PATH variable change.
 #export PATH="/usr/local/sbin:$PATH:$HOME/.rvm/bin"
+
+#PATH Stuff
+export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+
 function docker-start {
   typeset vm=${1:-default} sts
   case $vm in
@@ -557,3 +561,5 @@ function docker-stop {
   fi
   echo "-- Docker VM '$vm' is stopped."
 }
+
+antigen apply
