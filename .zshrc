@@ -23,6 +23,12 @@ plugins=(vagrant fasd complist git ruby sublime docker)
 alias cal=gcal
 alias bfg="java -jar $HOME/bin/bfg.jar"
 
+# Work stuff
+source $ZSH/oh-my-zsh.sh
+source $ZSH/tmuxinator.zsh
+export VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
+[ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
+
 source $ZSH/oh-my-zsh.sh
 source $ZSH/tmuxinator.zsh
 
