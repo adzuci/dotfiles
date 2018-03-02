@@ -15,8 +15,16 @@ brew upgrade
 brew install coreutils
 
 # Misc Work
+brew cask install virtualbox
+brew cask install docker
 brew install terraform
 brew install awscli
+brew update && brew install kops
+brew install kubernetes-cli
+brew cask install minikube
+brew install fzf
+brew install node
+npm install --global fast-cli
 
 # Install some other useful utilities like `sponge`.
 brew install moreutils
@@ -39,9 +47,6 @@ gem install tmuxinator
 brew install reattach-to-user-namespace
 brew install mr
 brew cask install sublime-text
-brew cask install virtualbox
-brew install docker
-brew cask install docker
 brew cask install spotify
 brew cask install caffeine
 brew cask install tunnelblick
