@@ -1,4 +1,4 @@
-# Mathias’s dotfiles
+# Adams’s dotfiles
 
 ![Screenshot of my shell prompt](https://i.imgur.com/EkEtphC.png)
 
@@ -55,10 +55,10 @@ My `~/.extra` looks something like this:
 ```bash
 # Git credentials
 # Not in the repository, to prevent people from accidentally committing under my name
-GIT_AUTHOR_NAME="Mathias Bynens"
+GIT_AUTHOR_NAME="Adam Blackwell"
 GIT_COMMITTER_NAME="$GIT_AUTHOR_NAME"
 git config --global user.name "$GIT_AUTHOR_NAME"
-GIT_AUTHOR_EMAIL="mathias@mailinator.com"
+GIT_AUTHOR_EMAIL=""
 GIT_COMMITTER_EMAIL="$GIT_AUTHOR_EMAIL"
 git config --global user.email "$GIT_AUTHOR_EMAIL"
 ```
@@ -83,19 +83,15 @@ When setting up a new Mac, you may want to install some common [Homebrew](https:
 
 Some of the functionality of these dotfiles depends on formulae installed by `brew.sh`. If you don’t plan to run `brew.sh`, you should look carefully through the script and manually install any particularly important ones. A good example is Bash/Git completion: the dotfiles use a special version from Homebrew.
 
-## Feedback
+## Authors
 
-Suggestions/improvements
-[welcome](https://github.com/mathiasbynens/dotfiles/issues)!
-
-## Author
-
-| [![twitter/mathias](http://gravatar.com/avatar/24e08a9ea84deb17ae121074d0f17125?s=70)](http://twitter.com/mathias "Follow @mathias on Twitter") |
+| [Adam Blackwell](https://blackwell.ai/) |
 |---|
 | [Mathias Bynens](https://mathiasbynens.be/) |
 
 ## Thanks to…
 
+* [Mathias Bynens](https://mathiasbynens.be/)
 * @ptb and [his _macOS Setup_ repository](https://github.com/ptb/mac-setup)
 * [Ben Alman](http://benalman.com/) and his [dotfiles repository](https://github.com/cowboy/dotfiles)
 * [Cătălin Mariș](https://github.com/alrra) and his [dotfiles repository](https://github.com/alrra/dotfiles)
