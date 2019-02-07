@@ -51,6 +51,10 @@ brew install zsh-syntax-highlighting
 cd ~ && git clone https://github.com/zsh-users/antigen.git .antigen
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
+# Editors
+brew cask install visual-studio-code
+code --install-extension eamodio.gitlens
+
 # Utilities
 brew cask install spectacle
 brew install tmux
