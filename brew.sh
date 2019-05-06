@@ -39,7 +39,7 @@ brew install moreutils
 # Install GNU `find`, `locate`, `updatedb`, and `xargs`, `g`-prefixed.
 brew install findutils
 # Install GNU `sed`, overwriting the built-in `sed`.
-brew install gnu-sed --with-default-names
+brew install gnu-sed
 # Install Bash 4.
 # Note: don’t forget to add `/usr/local/bin/bash` to `/etc/shells` before
 # running `chsh`.
@@ -77,6 +77,7 @@ brew cask install google-chrome
 brew cask install iterm2
 brew cask install lastpass
 brew cask install little-snitch
+brew cask install gpg-suite
 
 # App Store
 brew install mas 
@@ -84,15 +85,6 @@ brew install mas
 # Bear Notes & Evernote
 mas install 1091189122
 mas install 406056744
-
-
-# Code
-brew install python
-sudo easy_install pip
-sudo pip install --upgrade pip
-
-curl -L https://get.rvm.io | bash -s stable --rails --autolibs=enabled
-
 
 # MacOS settings
 defaults write NSGlobalDomain AppleShowAllExtensions -bool true
@@ -191,8 +183,7 @@ if ! fgrep -q '/usr/local/bin/zsh' /etc/shells; then
   chsh -s /usr/local/bin/zsh;
 fi;
 
-# Install `wget` with IRI support.
-brew install wget --with-iri
+brew install wget
 
 # Install GnuPG to enable PGP-signing commits.
 brew install gnupg
@@ -227,33 +218,6 @@ if [ ! -d "$CODE"/fonts ]; then
   popd
 fi
 
-# Install some CTF tools; see https://github.com/ctfs/write-ups.
-brew install aircrack-ng
-brew cask install java
-brew install bfg
-brew install binutils
-brew install binwalk
-brew install cifer
-brew install dex2jar
-brew install dns2tcp
-brew install fcrackzip
-brew install foremost
-brew install hashpump
-brew install hydra
-brew install john
-brew install knock
-brew install netpbm
-brew install nmap
-brew install pngcheck
-brew install socat
-brew install sqlmap
-brew install tcpflow
-brew install tcpreplay
-brew install tcptrace
-brew install ucspi-tcp # `tcpserver` etc.
-brew install xpdf
-brew install xz
-
 # Install other useful binaries.
 brew install ack
 #brew install exiv2
@@ -273,16 +237,17 @@ brew install vbindiff
 brew install zopfli
 
 # Misc Work
-brew cask install virtualbox
 brew cask install docker
 brew install terraform
 brew install awscli
-brew update && brew install kops
+brew tap wallix/awless; brew install awless
+brew install kops
 brew install kubernetes-cli
 brew cask install minikube
 brew install fzf
 brew install node
 npm install --global fast-cli
+brew install pass-otp
 
 # Install some other useful utilities like `sponge`.
 brew install moreutils
@@ -306,8 +271,8 @@ brew install reattach-to-user-namespace
 brew install mr
 brew cask install sublime-text
 brew cask install spotify
-brew cask install caffeine
-brew cask install tunnelblick
+#brew cask install caffeine
+#brew cask install tunnelblick
 brew cask install the-unarchiver
 brew install htop
 brew cask install istat-menus
@@ -315,15 +280,36 @@ brew cask install iterm2
 brew install telnet
 
 # Code
+
+# Python
 brew install python
 brew install python3
 sudo easy_install pip
 sudo pip install --upgrade pip
 pip3 install --upgrade pip setuptools wheel
 pip3 install virtualenv virtualenvwrapper
+code --install-extension ms-python.python
 
+# Ruby
 curl -L https://get.rvm.io | bash -s stable --rails --autolibs=enabled
+brew install rbenv
+rbenv install 2.6.3
+rbenv global 2.6.3
+gem install bundler
 
+# Go
+brew install go
+go get golang.org/x/tools/cmd/godoc
+go get github.com/golang/lint/golint
+code --install-extension ms-vscode.Go
+
+# Kubernetes
+brew tap jenkins-x/jx 
+brew install jx 
+
+# Databases
+brew install mysql
+brew install postgres
 
 # Finder settings
 defaults write com.apple.finder AppleShowAllFiles YES
@@ -354,37 +340,12 @@ brew install sfnt2woff
 brew install sfnt2woff-zopfli
 brew install woff2
 
-# Install some CTF tools; see https://github.com/ctfs/write-ups.
-brew install aircrack-ng
-brew install bfg
-brew install binutils
-brew install binwalk
-brew install cifer
-brew install dex2jar
-brew install dns2tcp
-brew install fcrackzip
-brew install foremost
-brew install hashpump
-brew install hydra
-brew install john
-brew install knock
-brew install netpbm
-brew install nmap
-brew install pngcheck
-brew install socat
-brew install sqlmap
-brew install tcpflow
-brew install tcpreplay
-brew install tcptrace
-brew install ucspi-tcp # `tcpserver` etc.
-brew install xpdf
-brew install xz
-
 # Install other useful binaries.
+brew install qrencode
 brew install ack
-#brew install exiv2
 brew install git
 brew install git-lfs
+brew install jq
 brew install imagemagick --with-webp
 brew install lua
 brew install lynx
@@ -398,6 +359,8 @@ brew install tree
 brew install vbindiff
 brew install zopfli
 brew install htop
+brew install csshx
+brew cask install java
 
 # Remove outdated versions from the cellar.
 brew cleanup
@@ -406,6 +369,33 @@ brew cleanup
 cd; mkdir code; cd code; git clone https://github.com/powerline/fonts.git; cd fonts; ./install.sh; cd
 
 xcode-select --install
+
+# Install some CTF tools; see https://github.com/ctfs/write-ups.
+brew install nmap
+brew install telnet
+#brew install aircrack-ng
+#brew install bfg
+#brew install binutils
+#brew install binwalk
+#brew install cifer
+#brew install dex2jar
+#brew install dns2tcp
+#brew install fcrackzip
+#brew install foremost
+#brew install hashpump
+#brew install hydra
+#brew install john
+#brew install knock
+#brew install netpbm
+#brew install pngcheck
+#brew install socat
+#brew install sqlmap
+#brew install tcpflow
+#brew install tcpreplay
+#brew install tcptrace
+#brew install ucspi-tcp # `tcpserver` etc.
+#brew install xpdf
+#brew install xz
 
 # Remove outdated versions from the cellar.
 brew cleanup

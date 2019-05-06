@@ -10,6 +10,7 @@ git config --global user.name "Adam Blackwell"
 
 export ZSH=$HOME/.oh-my-zsh
 export CODE=$HOME/code
+source ~/.zsh_profile
 
 ulimit -n 4096
 
@@ -19,19 +20,33 @@ ulimit -n 4096
 # time that oh-my-zsh is loaded.
 ZSH_THEME="agnoster"
 
-plugins=(vagrant fasd complist git ruby sublime docker)
+plugins=(vagrant fasd git ruby sublime docker tmuxinator)
 alias cal=gcal
 alias bfg="java -jar $HOME/bin/bfg.jar"
 
-# Work stuff
-source $ZSH/oh-my-zsh.sh
-source $ZSH/tmuxinator.zsh
+# Code
+autoload bashcompinit
+bashcompinit
+
+# Python
 export VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
+
+# Ruby
+eval "$(rbenv init -)"
+
+# Kubernetes
 [ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
 
+# Work stuff
+source $CODE/edx/edx-iam/util/assume-role.sh
+
+# Shell
+
 source $ZSH/oh-my-zsh.sh
 source $ZSH/tmuxinator.zsh
 
+# Aliases
+alias ag='allgit'
 alias cfs="aws cloudformation describe-stacks --query 'Stacks[].StackName'"
 alias asgs="aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[].AutoScalingGroupName'"
 alias elbs="aws elb describe-load-balancers --query 'LoadBalancerDescriptions[].LoadBalancerName'"
@@ -96,15 +111,12 @@ alias v.cdsitepackages='cdsitepackages'
 alias v.cd='cdvirtualenv'
 alias v.lssitepackages='lssitepackages'
 
-# Ruby
-source ~/.profile
-
 #Mail
 textme(){
    echo "$@" | sendmail 2072458048@vtext.com
 }
 
-alias code='cd ~/code'
+alias c='cd ~/code'
 
 # rc
 alias rc='vi ~/.zshrc'
@@ -518,8 +530,11 @@ autoload zmv
 # Add RVM and Pyenv to PATH for scripting. Make sure this is the last PATH variable change.
 #export PATH="/usr/local/sbin:$PATH:$HOME/.rvm/bin"
 
-#PATH Stuff
-export PATH="/usr/local/opt/python/libexec/bin:$PATH"
+# PATH Stuff
+export GOPATH=$HOME/go
+export GOBIN=$GOPATH/bin
+export PATH="$HOME/bin:/usr/local/opt/python/libexec/bin:$PATH:$GOPATH:$GOBIN"
+export PATH="$PATH:$CODE/tools/allgit"
 
 function docker-start {
   typeset vm=${1:-default} sts
@@ -569,3 +584,4 @@ function docker-stop {
 }
 
 antigen apply
+export PATH="/usr/local/sbin:$PATH"
