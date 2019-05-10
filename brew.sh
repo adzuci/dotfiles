@@ -56,6 +56,8 @@ brew cask install visual-studio-code
 code --install-extension eamodio.gitlens
 
 # Utilities
+brew cask install multipass
+brew install the_silver_searcher
 brew cask install spectacle
 brew install tmux
 gem install tmuxinator

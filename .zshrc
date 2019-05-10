@@ -46,7 +46,7 @@ source $ZSH/oh-my-zsh.sh
 source $ZSH/tmuxinator.zsh
 
 # Aliases
-alias ag='allgit'
+# alias ag='allgit'
 alias cfs="aws cloudformation describe-stacks --query 'Stacks[].StackName'"
 alias asgs="aws autoscaling describe-auto-scaling-groups --query 'AutoScalingGroups[].AutoScalingGroupName'"
 alias elbs="aws elb describe-load-balancers --query 'LoadBalancerDescriptions[].LoadBalancerName'"
@@ -585,3 +585,5 @@ function docker-stop {
 
 antigen apply
 export PATH="/usr/local/sbin:$PATH"
+source <(awless completion zsh)
+
