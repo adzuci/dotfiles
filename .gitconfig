@@ -97,13 +97,24 @@
 	ci = commit
 	br = branch
 	co = checkout
-	df = diff
+	df = diff --color-words
 	dc = diff --cached
-	lg = log -p
 	lol = log --graph --decorate --pretty=oneline --abbrev-commit
 	lola = log --graph --decorate --pretty=oneline --abbrev-commit --all
 	ls = ls-files
 	ign = ls-files -o -i --exclude-standard
+	au = !git add -u . && git status
+	aa = !git add . && git add -u . && git status
+	ca = commit --amend
+	cane = commit --amend --no-edit
+	yolo = !git commit --amend --no-edit && git push --force
+	lg = log --graph --pretty=format:'%Cred%h%Creset %C(yellow)%an%d%Creset %s %Cgreen(%cr)%Creset'
+	pro = pull --rebase origin
+	po = push origin
+	cp = cherry-pick
+	ri = !sh -c 'git rebase -i HEAD~$1' -
+	untrack = update-index --assume-unchanged
+	track = update-index --no-assume-unchanged
 
 [apply]
 
