@@ -241,6 +241,7 @@ brew install zopfli
 # Misc Work
 brew cask install docker
 brew install terraform
+brew install warrensbox/tap/tfswitch
 brew install awscli
 brew tap wallix/awless; brew install awless
 brew install kops
