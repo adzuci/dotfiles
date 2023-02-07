@@ -52,34 +52,34 @@ cd ~ && git clone https://github.com/zsh-users/antigen.git .antigen
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
 
 # Editors
-brew cask install visual-studio-code
+brew install --cask visual-studio-code
 code --install-extension eamodio.gitlens
 
 # Utilities
-brew cask install multipass
+brew install --cask multipass
 brew install the_silver_searcher
-brew cask install spectacle
+brew install --cask spectacle
 brew install tmux
 gem install tmuxinator
 gem install teamocil
 brew install mr
-brew cask install sublime-text
-brew cask install atom
-brew cask install pycharm
-brew cask install virtualbox
+brew install --cask sublime-text
+brew install --cask atom
+brew install --cask pycharm
+brew install --cask virtualbox
 brew install docker
-brew cask install docker
-brew cask install spotify
-brew cask install caffeine
-brew cask install tunnelblick
-brew cask install the-unarchiver
+brew install --cask docker
+brew install --cask spotify
+brew install --cask caffeine
+brew install --cask tunnelblick
+brew install --cask the-unarchiver
 brew install htop
-brew cask install istat-menus
-brew cask install google-chrome
-brew cask install iterm2
-brew cask install lastpass
-brew cask install little-snitch
-brew cask install gpg-suite
+brew install --cask istat-menus
+brew install --cask google-chrome
+brew install --cask iterm2
+brew install --cask lastpass
+brew install --cask little-snitch
+brew install --cask gpg-suite
 
 # App Store
 brew install mas 
@@ -239,14 +239,14 @@ brew install vbindiff
 brew install zopfli
 
 # Misc Work
-brew cask install docker
+brew install --cask docker
 brew install terraform
 brew install warrensbox/tap/tfswitch
 brew install awscli
 brew tap wallix/awless; brew install awless
 brew install kops
 brew install kubernetes-cli
-brew cask install minikube
+brew install --cask minikube
 brew install fzf
 brew install node
 npm install --global fast-cli
@@ -267,19 +267,19 @@ brew install bash-completion2
 brew install zsh zsh-completions
 cd ~ && git clone https://github.com/zsh-users/antigen.git .antigen
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/robbyrussell/oh-my-zsh/master/tools/install.sh)"
-brew cask install spectacle
+brew install --cask spectacle
 brew install tmux
 gem install tmuxinator
 brew install reattach-to-user-namespace
 brew install mr
-brew cask install sublime-text
-brew cask install spotify
-#brew cask install caffeine
-#brew cask install tunnelblick
-brew cask install the-unarchiver
+brew install --cask sublime-text
+brew install --cask spotify
+#brew install --cask caffeine
+#brew install --cask tunnelblick
+brew install --cask the-unarchiver
 brew install htop
-brew cask install istat-menus
-brew cask install iterm2
+brew install --cask istat-menus
+brew install --cask iterm2
 brew install telnet
 
 # Code
@@ -363,7 +363,7 @@ brew install vbindiff
 brew install zopfli
 brew install htop
 brew install csshx
-brew cask install java
+brew install --cask java
 
 # Remove outdated versions from the cellar.
 brew cleanup
