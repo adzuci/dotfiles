@@ -281,6 +281,7 @@ brew install htop
 brew install --cask istat-menus
 brew install --cask iterm2
 brew install telnet
+brew install kubectx
 
 # Code
 
