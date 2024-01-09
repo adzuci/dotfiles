@@ -192,6 +192,8 @@ brew install gnupg
 
 # Install more recent versions of some macOS tools.
 brew install vim --with-override-system-vi
+mkdir ~/.vim/backups
+mkdir ~/.vim/swap
 brew install grep
 brew install openssh
 brew install screen
