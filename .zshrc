@@ -129,6 +129,42 @@ alias c='cd ~/code'
 # rc
 alias rc='vi ~/.zshrc'
 
+# Init a Python repo with pyenv venv + defaults
+py-init() {
+  local pyver="${1:-3.14.2}"
+  local venv="${2:-$(basename "$PWD")}"
+
+  if [ ! -f .gitignore ]; then
+    cat > .gitignore <<'EOF'
+__pycache__/
+*.py[cod]
+.Python
+.env
+.venv
+venv/
+.mypy_cache/
+.pytest_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+.ipynb_checkpoints/
+dist/
+build/
+*.egg-info/
+EOF
+  fi
+
+  if [ ! -d .git ]; then
+    git init
+  fi
+
+  pyenv install -s "$pyver"
+  if ! pyenv versions --bare | grep -qx "$venv"; then
+    pyenv virtualenv "$pyver" "$venv"
+  fi
+  pyenv local "$venv"
+}
+
 # Skip all this for non-interactive shells
 [[ -z "$PS1" ]] && return
 
@@ -553,10 +589,13 @@ if command -v pyenv >/dev/null 2>&1; then
 fi
 
 # Show pyenv venv in prompt
-if (( ${+functions[pyenv_prompt]} )); then
-  setopt PROMPT_SUBST
-  PS1='$(pyenv_prompt)'"$PS1"
-fi
+pyenv_venv_prompt() {
+  if [[ -n "${VIRTUAL_ENV:-}" ]]; then
+    echo "($(basename "$VIRTUAL_ENV")) "
+  fi
+}
+setopt PROMPT_SUBST
+PS1='$(pyenv_venv_prompt)'"$PS1"
 
 #antigen apply
 if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
