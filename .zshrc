@@ -533,6 +533,7 @@ export PATH="$PATH:$HOME/Library/Python/3.11/bin"
 if [[ "$(uname -m)" == "arm64" ]]; then
   path=(${path:#/usr/local/bin} ${path:#/usr/local/sbin} ${path:#/usr/local/opt/python/libexec/bin})
 fi
+rehash 2>/dev/null || true
 
 #antigen apply
 if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
@@ -540,7 +541,7 @@ if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec
 fi
 
 export NVM_DIR="$HOME/.nvm"
-if ! command -v fnm >/dev/null 2>&1; then
+if [[ "$(uname -m)" != "arm64" ]] || [[ "${USE_NVM:-}" == "1" ]]; then
   [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
   [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 fi
