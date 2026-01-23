@@ -552,6 +552,12 @@ if command -v pyenv >/dev/null 2>&1; then
   fi
 fi
 
+# Show pyenv venv in prompt
+if (( ${+functions[pyenv_prompt]} )); then
+  setopt PROMPT_SUBST
+  PS1='$(pyenv_prompt)'"$PS1"
+fi
+
 #antigen apply
 if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
   . "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh"
