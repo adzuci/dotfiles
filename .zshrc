@@ -3,14 +3,50 @@
 # Some functions taken from various web sites/mailing lists, others written
 # myself.
 #
-# Last updated February 2018
+# Last updated Sept 2023
 
-git config --global user.email "adam@blackwell.ai"
+git config --global user.email "ablackwell@2u.com"
 git config --global user.name "Adam Blackwell"
 
 export ZSH=$HOME/.oh-my-zsh
 export CODE=$HOME/code
-source ~/.zsh_profile
+source ~/.profile
+autoload -Uz compinit && compinit
+autoload bashcompinit && bashcompinit
+
+# AWS
+export ONELOGIN_EMAIL="ablackwell@2u.com"
+export UPDATE_PS1_ASSUME_ROLE=false
+source $CODE/edx/edx-internal/scripts/assume-role-onelogin.sh
+alias assume=assume_role
+
+
+
+
+
+
+
+
+
+
+
+
+
+ad-get-users-groups ()
+{
+ local user=${1:?"No Username Provided/"};
+ dscl '/Active Directory/2TOR/All Domains' read "/Users/${user}" dsAttrTypeNative:memberOf | ( read -r;
+ printf "%s\n" "$REPLY";
+ sort -f )
+}
+
+ad-get-group-members ()
+{
+ local group=${1:?"No Group Provided/"};
+ dscl '/Active Directory/2TOR/All Domains' read "/Groups/${group}" GroupMembership | ( read -r;
+ printf "%s\n" "$REPLY";
+ sort -f )
+}
 
 ulimit -n 4096
 
@@ -21,15 +57,12 @@ ulimit -n 4096
 ZSH_THEME="agnoster"
 
 #plugins=(git)
+
 alias cal=gcal
 alias bfg="java -jar $HOME/bin/bfg.jar"
 
-# Code
-autoload bashcompinit
-bashcompinit
-
 # Python
-export VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
+#export VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
 
 # Ruby
 #eval "$(rbenv init -)"
@@ -61,9 +94,6 @@ alias deploys="aws ec2 describe-tags --filter \"Name=tag-key,Values=Deployment\"
 #antigen bundle history
 #antigen bundle command-not-found
 
-# Third Party
-#antigen bundle kennethreitz/autoenv
-
 # Syntax highlighting bundle.
 #antigen bundle zsh-users/zsh-completions src
 #antigen bundle zsh-users/zsh-syntax-highlighting
@@ -93,17 +123,6 @@ syspip(){
    PIP_REQUIRE_VIRTUALENV="" pip "$@"
 }
 
-source /usr/local/bin/virtualenvwrapper.sh
-alias v='workon'
-alias v.deactivate='deactivate'
-alias v.mk='mkvirtualenv'
-alias v.rm='rmvirtualenv'
-alias v.switch='workon'
-alias v.add2virtualenv='add2virtualenv'
-alias v.cdsitepackages='cdsitepackages'
-alias v.cd='cdvirtualenv'
-alias v.lssitepackages='lssitepackages'
-
 #Mail
 textme(){
    echo "$@" | sendmail 2072458048@vtext.com
@@ -119,6 +138,7 @@ alias rc='vi ~/.zshrc'
 
 # Set prompt (white and purple, nothing too fancy)
 PS1=$'%{\e[0;37m%}%B%*%b %{\e[0;35m%}%m:%{\e[0;37m%}%~ %(!.#.>) %{\e[00m%}'
+XDG_CONFIG_DIRS=$HOME/.config
 
 # Set less options
 if [[ -x $(which less) ]]
@@ -215,7 +235,6 @@ alias 'vnc=ssh -f -L 9999:localhost:5901 ada2358@pacman.ccs.neu.edu \ vncviewer 
 alias 'vncs=vncserver -nolisten tcp -localhost -nevershared -geometry 1278x945'
 
 # Useful KDE integration (see later for definition of z)
-alias 'k=z kate -u' # -u is reuse existing session if possible
 alias 'q=z kfmclient openURL' # Opens (or executes a .desktop) arg1 in Konqueror
 
 # These are useful with the Dvorak keyboard layout
@@ -354,35 +373,6 @@ chpwd() {
         *xterm*|rxvt|(dt|k|E)term) print -Pn "\e]2;%m:%~\a";;
     esac
 }
-
-# For changing the umask automatically
-# Maybe I should be using chpwd for this.
-umask 0077
-cd() {
-    builtin cd $*
-
-    # Private folders
-    if [[ -z ${~PWD:#${HOME}/documents*} ||
-  				-z ${~PWD:#${HOME}/imperial*}  ||
-  				-z ${~PWD:#${HOME}}            ||
-  				-z ${~PWD:#$/tmp/Adam/*}       ]] then
-        if [[ $(umask) -ne 077 ]] then
-            umask 0077
-            echo -e "\033[01;32mUmask: private \033[m"
-  			fi
-    fi
-    # Web permissions
-    if [[ -z ${~PWD:#/.www*}       ||
-        # -z ${~PWD:#/matt/web*}   ||
-          -z ${~PWD:#${HOME}/www*} ]] then
-        if [[ $(umask) -ne 072 ]] then
-            umask 0072
-            echo -e "\033[01;33mUmask: other readable \033[m"
-        fi
-    fi
-}
-
-cd . &> /dev/null
 
 # For quickly plotting data with gnuplot.  Arguments are files for 'plot "<file>" with lines'.
 plot () {
@@ -532,8 +522,6 @@ export PATH="$PATH:$HOME/Library/Python/3.11/bin"
 
 #antigen apply
 export PATH="/usr/local/sbin:$PATH"
-source <(awless completion zsh)
-
 
 . /usr/local/opt/asdf/libexec/asdf.sh
 
