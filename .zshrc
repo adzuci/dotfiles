@@ -25,8 +25,6 @@ autoload bashcompinit && bashcompinit
 # AWS
 export ONELOGIN_EMAIL="ablackwell@2u.com"
 export UPDATE_PS1_ASSUME_ROLE=false
-source $CODE/edx/edx-internal/scripts/assume-role-onelogin.sh
-alias assume=assume_role
 
 ad-get-users-groups ()
 {
@@ -131,6 +129,10 @@ alias rc='vi ~/.zshrc'
 
 # Skip all this for non-interactive shells
 [[ -z "$PS1" ]] && return
+
+# AWS (interactive shells only)
+source $CODE/edx/edx-internal/scripts/assume-role-onelogin.sh
+alias assume=assume_role
 
 # Set prompt (white and purple, nothing too fancy)
 PS1=$'%{\e[0;37m%}%B%*%b %{\e[0;35m%}%m:%{\e[0;37m%}%~ %(!.#.>) %{\e[00m%}'
@@ -534,6 +536,14 @@ if [[ "$(uname -m)" == "arm64" ]]; then
   path=(${path:#/usr/local/bin} ${path:#/usr/local/sbin} ${path:#/usr/local/opt/python/libexec/bin})
 fi
 rehash 2>/dev/null || true
+
+# Pyenv (interactive shells only)
+if command -v pyenv >/dev/null 2>&1; then
+  export PYENV_ROOT="$HOME/.pyenv"
+  export PATH="$PYENV_ROOT/bin:$PATH"
+  eval "$(pyenv init --path)"
+  eval "$(pyenv init -)"
+fi
 
 #antigen apply
 if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
