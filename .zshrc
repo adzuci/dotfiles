@@ -28,18 +28,6 @@ export UPDATE_PS1_ASSUME_ROLE=false
 source $CODE/edx/edx-internal/scripts/assume-role-onelogin.sh
 alias assume=assume_role
 
-
-
-
-
-
-
-
-
-
-
-
-
 ad-get-users-groups ()
 {
  local user=${1:?"No Username Provided/"};
@@ -522,6 +510,7 @@ autoload zmv
 #export PATH="/usr/local/sbin:$PATH:$HOME/.rvm/bin"
 
 # PATH Stuff
+export PATH="/opt/homebrew/bin:/opt/homebrew/sbin:/bin:/usr/bin:/sbin:/usr/sbin:$PATH"
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 if [[ -d /opt/homebrew ]]; then
@@ -540,14 +529,21 @@ fi
 export PATH="$PATH:$CODE/tools/allgit"
 export PATH="$PATH:$HOME/Library/Python/3.11/bin"
 
+# Prefer arm64 toolchain on Apple Silicon
+if [[ "$(uname -m)" == "arm64" ]]; then
+  path=(${path:#/usr/local/bin} ${path:#/usr/local/sbin} ${path:#/usr/local/opt/python/libexec/bin})
+fi
+
 #antigen apply
 if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
   . "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh"
 fi
 
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if ! command -v fnm >/dev/null 2>&1; then
+  [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+  [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+fi
 
 # Added by Antigravity
 export PATH="/Users/adam/.antigravity/antigravity/bin:$PATH"
@@ -558,3 +554,8 @@ export PATH="/Users/adam/.antigravity/antigravity/bin:$PATH"
 # bun
 export BUN_INSTALL="$HOME/.bun"
 export PATH="$BUN_INSTALL/bin:$PATH"
+
+# Node
+if command -v fnm >/dev/null 2>&1; then
+  eval "$(fnm env --use-on-cd)"
+fi
