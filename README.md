@@ -73,15 +73,38 @@ When setting up a new Mac, you may want to set some sensible macOS defaults:
 ./.macos
 ```
 
-### Install Homebrew formulae
+### Install Homebrew formulae and apps
 
-When setting up a new Mac, you may want to install some common [Homebrew](https://brew.sh/) formulae (after installing Homebrew, of course):
+When setting up a new Mac, you may want to install the common Homebrew formulae and casks defined in `Brewfile`:
 
 ```bash
 ./brew.sh
 ```
 
-Some of the functionality of these dotfiles depends on formulae installed by `brew.sh`. If you don’t plan to run `brew.sh`, you should look carefully through the script and manually install any particularly important ones. A good example is Bash/Git completion: the dotfiles use a special version from Homebrew.
+This runs `brew bundle` against `Brewfile`. If you don’t plan to run `brew.sh`, you should look carefully through `Brewfile` and manually install any particularly important ones (e.g., shell tooling and completions).
+
+### App settings (Rectangle, Cursor, Sunsama)
+
+This repo supports importing app settings from `init/` using `app-settings.sh`. Put exports in `init/` and run:
+
+```bash
+./app-settings.sh
+```
+
+Supported imports (optional):
+- Rectangle: `init/rectangle.plist` (export with `defaults export com.knollsoft.Rectangle init/rectangle.plist`)
+- Sunsama: `init/sunsama.plist` (export with `defaults export com.sunsama.native-app init/sunsama.plist`)
+- Cursor: `init/cursor-user/` directory copied from `~/Library/Application Support/Cursor/User`
+ - Wispr Flow: no reliable settings export found yet; configure manually after install.
+
+`app-settings.sh` will prompt before overwriting existing settings and will back up any existing Cursor settings directory.
+
+### New laptop checklist
+
+1. `source bootstrap.sh`
+2. `./brew.sh` (installs formulae, casks, and fonts)
+3. `./.macos`
+4. `./app-settings.sh`
 
 ## Authors
 
