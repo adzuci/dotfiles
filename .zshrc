@@ -18,9 +18,11 @@ git config --global user.name "Adam Blackwell"
 
 export ZSH=$HOME/.oh-my-zsh
 export CODE=$HOME/code
-source ~/.profile
-autoload -Uz compinit && compinit
-autoload bashcompinit && bashcompinit
+if [[ -n "$PS1" ]]; then
+  source ~/.profile
+  autoload -Uz compinit && compinit
+  autoload bashcompinit && bashcompinit
+fi
 
 # AWS
 export ONELOGIN_EMAIL="ablackwell@2u.com"
