@@ -545,6 +545,11 @@ if command -v pyenv >/dev/null 2>&1; then
   export PATH="$PYENV_ROOT/bin:$PATH"
   eval "$(pyenv init --path)"
   eval "$(pyenv init -)"
+  if command -v pyenv-virtualenv-init >/dev/null 2>&1; then
+    export PYENV_VIRTUALENV_PROMPT="(%s) "
+    export PYENV_VIRTUALENV_DISABLE_PROMPT=0
+    eval "$(pyenv virtualenv-init -)"
+  fi
 fi
 
 #antigen apply
