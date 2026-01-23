@@ -20,7 +20,7 @@ ulimit -n 4096
 # time that oh-my-zsh is loaded.
 ZSH_THEME="agnoster"
 
-plugins=(vagrant fasd git ruby sublime docker tmuxinator)
+#plugins=(git)
 alias cal=gcal
 alias bfg="java -jar $HOME/bin/bfg.jar"
 
@@ -32,18 +32,15 @@ bashcompinit
 export VIRTUALENVWRAPPER_PYTHON=/usr/local/opt/python/libexec/bin/python
 
 # Ruby
-eval "$(rbenv init -)"
+#eval "$(rbenv init -)"
 
 # Kubernetes
-[ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
-
-# Work stuff
-source $CODE/edx/edx-iam/util/assume-role.sh
+#[ -f $HOME/bin/fubectl.source ] && source $HOME/bin/fubectl.source
 
 # Shell
 
-source $ZSH/oh-my-zsh.sh
-source $ZSH/tmuxinator.zsh
+#source $ZSH/oh-my-zsh.sh
+#source $ZSH/tmuxinator.zsh
 
 # Aliases
 # alias ag='allgit'
@@ -53,28 +50,24 @@ alias elbs="aws elb describe-load-balancers --query 'LoadBalancerDescriptions[].
 alias deploys="aws ec2 describe-tags --filter \"Name=tag-key,Values=Deployment\" --query 'Tags[].Value' | grep '\"' | sed 's/.*\"\(.*"
 
 # antigen
-source ~/.antigen/antigen.zsh
+#source ~/.antigen/antigen.zsh
 
 # Load the oh-my-zsh's library.
-antigen use oh-my-zsh
+#antigen use oh-my-zsh
 
 # Bundles from the default repo (robbyrussell's oh-my-zsh).
-antigen bundle git
-antigen bundle rsync
-antigen bundle heroku
-antigen bundle pip
-antigen bundle lein
-antigen bundle python
-antigen bundle history
-antigen bundle command-not-found
+#antigen bundle git
+#antigen bundle python
+#antigen bundle history
+#antigen bundle command-not-found
 
 # Third Party
-antigen bundle kennethreitz/autoenv
+#antigen bundle kennethreitz/autoenv
 
 # Syntax highlighting bundle.
-antigen bundle zsh-users/zsh-completions src
-antigen bundle zsh-users/zsh-syntax-highlighting
-antigen theme arialdomartini/oh-my-git-themes oppa-lana-style
+#antigen bundle zsh-users/zsh-completions src
+#antigen bundle zsh-users/zsh-syntax-highlighting
+#antigen theme arialdomartini/oh-my-git-themes oppa-lana-style
 
 
 # OSX Specific
@@ -348,7 +341,7 @@ f() {
 
 # Remap Dvorak-Qwerty quickly
 alias 'aoeu=setxkbmap gb' # (British keyboard layout)
-alias 'asdf=setxkbmap gb dvorak 2> /dev/null || setxkbmap dvorak gb 2> /dev/null || setxkbmap dvorak'
+#alias 'asdf=setxkbmap gb dvorak 2> /dev/null || setxkbmap dvorak gb 2> /dev/null || setxkbmap dvorak'
 
 # Clear konsole history
 alias 'zaph=dcop $KONSOLE_DCOP_SESSION clearHistory'
@@ -535,55 +528,25 @@ export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
 export PATH="$HOME/bin:/usr/local/opt/python/libexec/bin:$PATH:$GOPATH:$GOBIN"
 export PATH="$PATH:$CODE/tools/allgit"
+export PATH="$PATH:$HOME/Library/Python/3.11/bin"
 
-function docker-start {
-  typeset vm=${1:-default} sts
-  case $vm in
-    -h|--help)
-      echo $'usage: docker-start [<vm>]\n\nEnsures that the specified/default Docker VM is started\nand the environment is initialized.'
-      return 0
-      ;;
-  esac
-  sts=$(docker-machine status "$vm") || return
-  [[ $sts == 'Running' ]] && echo "(Docker VM '$vm' is already running.)" || { 
-    echo "-- Starting Docker VM '$vm' (\`docker-machine start "$vm"\`; this will take a while)..."; 
-    docker-machine start "$vm" || return
-  }
-  echo "-- Setting DOCKER_* environment variables (\`eval \"\$(docker-machine env "$vm")\"\`)..."
-  # Note: If the machine hasn't fully finished starting up yet from a
-  #       previously launched-but-not-waited-for-completion `docker-machine status`,
-  #       the following may output error messages; alas, without signaling failure
-  #       via the exit code. Simply rerun this function to retry.
-  eval "$(docker-machine env "$vm")" || return
-  export | grep -o 'DOCKER_.*'
-  echo "-- Docker VM '$vm' is running."
-}
-
-function docker-stop {
-  typeset vm=${1:-default} sts envVarNames fndx
-  case $vm in
-    -h|--help)
-      echo $'usage: docker-stop [<vm>]\n\nEnsures that the specified/default Docker VM is stopped\nand the environment is cleaned up.'
-      return 0
-      ;;
-  esac
-  sts=$(docker-machine status "$vm") || return
-  [[ $sts == 'Running' ]] && { 
-    echo "-- Stopping Docker VM '$vm' (\`docker-machine stop "$vm"\`)...";
-    docker-machine stop "$vm" || return
-  } || echo "(Docker VM '$vm' is not running.)"
-  [[ -n $BASH_VERSION ]] && fndx=3 || fndx=1 # Bash prefixes defs. wit 'declare -x '
-  envVarNames=( $(export | awk -v fndx="$fndx" '$fndx ~ /^DOCKER_/ { sub(/=.*/,"", $fndx); print $fndx }') )
-  if [[ -n $envVarNames ]]; then
-    echo "-- Unsetting DOCKER_* environment variables ($(echo "${envVarNames[@]}" | sed 's/ /, /g'))..."
-    unset "${envVarNames[@]}"
-  else
-    echo "(No DOCKER_* environment variables to unset.)"
-  fi
-  echo "-- Docker VM '$vm' is stopped."
-}
-
-antigen apply
+#antigen apply
 export PATH="/usr/local/sbin:$PATH"
 source <(awless completion zsh)
 
+
+. /usr/local/opt/asdf/libexec/asdf.sh
+
+export NVM_DIR="$HOME/.nvm"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
+[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+
+# Added by Antigravity
+export PATH="/Users/adam/.antigravity/antigravity/bin:$PATH"
+
+# bun completions
+[ -s "/Users/adam/.bun/_bun" ] && source "/Users/adam/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
