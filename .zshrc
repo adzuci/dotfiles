@@ -5,6 +5,14 @@
 #
 # Last updated Sept 2023
 
+# If Cursor launches under Rosetta, re-exec as arm64.
+if [[ "$(uname -m)" == "x86_64" ]] && [[ -z "${ZSH_ARCH_FIXED:-}" ]]; then
+  if [[ "$(sysctl -n sysctl.proc_translated 2>/dev/null)" == "1" ]]; then
+    export ZSH_ARCH_FIXED=1
+    exec /usr/bin/arch -arm64 /bin/zsh -l
+  fi
+fi
+
 git config --global user.email "ablackwell@2u.com"
 git config --global user.name "Adam Blackwell"
 
@@ -516,14 +524,26 @@ autoload zmv
 # PATH Stuff
 export GOPATH=$HOME/go
 export GOBIN=$GOPATH/bin
-export PATH="$HOME/bin:/usr/local/opt/python/libexec/bin:$PATH:$GOPATH:$GOBIN"
+if [[ -d /opt/homebrew ]]; then
+  export HOMEBREW_PREFIX="/opt/homebrew"
+elif [[ -d /usr/local ]]; then
+  export HOMEBREW_PREFIX="/usr/local"
+fi
+if [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
+  export PATH="$HOMEBREW_PREFIX/bin:$HOMEBREW_PREFIX/sbin:$PATH"
+fi
+if [[ -n "${HOMEBREW_PREFIX:-}" ]]; then
+  export PATH="$HOME/bin:$HOMEBREW_PREFIX/opt/python/libexec/bin:$PATH:$GOPATH:$GOBIN"
+else
+  export PATH="$HOME/bin:$PATH:$GOPATH:$GOBIN"
+fi
 export PATH="$PATH:$CODE/tools/allgit"
 export PATH="$PATH:$HOME/Library/Python/3.11/bin"
 
 #antigen apply
-export PATH="/usr/local/sbin:$PATH"
-
-. /usr/local/opt/asdf/libexec/asdf.sh
+if [[ -n "${HOMEBREW_PREFIX:-}" ]] && [[ -r "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh" ]]; then
+  . "${HOMEBREW_PREFIX}/opt/asdf/libexec/asdf.sh"
+fi
 
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
