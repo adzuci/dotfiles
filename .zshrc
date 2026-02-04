@@ -13,7 +13,7 @@ if [[ "$(uname -m)" == "x86_64" ]] && [[ -z "${ZSH_ARCH_FIXED:-}" ]]; then
   fi
 fi
 
-git config --global user.email "ablackwell@2u.com"
+git config --global user.email "adam@blackwell.ai"
 git config --global user.name "Adam Blackwell"
 
 export ZSH=$HOME/.oh-my-zsh
@@ -25,7 +25,7 @@ if [[ -n "$PS1" ]]; then
 fi
 
 # AWS
-export ONELOGIN_EMAIL="ablackwell@2u.com"
+export ONELOGIN_EMAIL="adam@blackwell.ai"
 export UPDATE_PS1_ASSUME_ROLE=false
 
 ad-get-users-groups ()
