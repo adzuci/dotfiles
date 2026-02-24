@@ -168,10 +168,6 @@ EOF
 # Skip all this for non-interactive shells
 [[ -z "$PS1" ]] && return
 
-# AWS (interactive shells only)
-source $CODE/edx/edx-internal/scripts/assume-role-onelogin.sh
-alias assume=assume_role
-
 # Set prompt (white and purple, nothing too fancy)
 PS1=$'%{\e[0;37m%}%B%*%b %{\e[0;35m%}%m:%{\e[0;37m%}%~ %(!.#.>) %{\e[00m%}'
 XDG_CONFIG_DIRS=$HOME/.config
