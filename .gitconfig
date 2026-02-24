@@ -1,7 +1,10 @@
-[user]
+[gpg]
+	format = ssh
 
-	email = adam@blackwell.ai
+[user]
+	signingkey = /Users/adamblackwell/.ssh/id_ed25519.pub
 	name = Adam Blackwell
+	email = adam.blackwell@apollo.io
 
 [alias]
 
@@ -174,6 +177,12 @@
 	# https://help.github.com/articles/signing-commits-using-gpg/
 	# gpgsign = true
 
+[tag]
+	gpgsign = true
+
+[gpg "ssh"]
+	allowedSignersFile = /Users/adamblackwell/.config/git/allowed_signers
+
 [diff]
 
 	# Detect copies as well as renames
@@ -227,3 +236,7 @@
 
 [gpg]
 	program = gpg2
+
+[init]
+
+	defaultBranch = main
