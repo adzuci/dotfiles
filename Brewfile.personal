@@ -1,0 +1,11 @@
+brew "mas"
+
+cask "istat-menus"
+cask "little-snitch"
+cask "spotify"
+cask "the-unarchiver"
+cask "tunnelblick"
+cask "wispr-flow"
+
+mas "Bear", id: 1091189122
+mas "Evernote", id: 406056744

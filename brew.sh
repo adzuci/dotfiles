@@ -15,7 +15,10 @@ if ! command -v brew >/dev/null 2>&1; then
 fi
 
 brew update
-brew bundle --file "$repo_root/Brewfile"
+brew bundle --file "$repo_root/Brewfile.base"
+if [ "${1:-}" != "--base-only" ]; then
+  brew bundle --file "$repo_root/Brewfile.personal"
+fi
 
 # Optional post-bundle installs
 if command -v npm >/dev/null 2>&1; then

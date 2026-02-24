@@ -75,13 +75,13 @@ When setting up a new Mac, you may want to set some sensible macOS defaults:
 
 ### Install Homebrew formulae and apps
 
-When setting up a new Mac, you may want to install the common Homebrew formulae and casks defined in `Brewfile`:
+When setting up a new Mac, you may want to install the common Homebrew formulae and casks defined in `Brewfile.base` and `Brewfile.personal`:
 
 ```bash
 ./brew.sh
 ```
 
-This runs `brew bundle` against `Brewfile`. If you don’t plan to run `brew.sh`, you should look carefully through `Brewfile` and manually install any particularly important ones (e.g., shell tooling and completions).
+This runs `brew bundle` against both `Brewfile.base` (work tools) and `Brewfile.personal` (Tunnelblick, Bear, Evernote, etc.). For work laptops, use `./brew.sh --base-only` to skip personal apps.
 
 ### App settings (Rectangle, Cursor, Sunsama)
 
