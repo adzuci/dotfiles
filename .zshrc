@@ -564,7 +564,7 @@ else
 fi
 export PATH="$PATH:$CODE/tools/allgit"
 export PATH="$PATH:$HOME/Library/Python/3.11/bin"
-export PATH="$HOME:$PATH"
+export PATH="$HOME/.local/bin:$PATH"
 
 # Prefer arm64 toolchain on Apple Silicon
 if [[ "$(uname -m)" == "arm64" ]]; then
