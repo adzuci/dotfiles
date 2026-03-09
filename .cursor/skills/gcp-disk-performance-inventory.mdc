@@ -1,0 +1,549 @@
+---
+name: gcp-disk-performance-inventory
+description: Guide for analyzing GCP disk capacity and performance across projects. Activate when user asks for disk inventory, storage usage, disk capacity reports, or storage performance analysis including IOPS and throughput limits per machine type.
+---
+
+# GCP Disk Inventory & Storage Performance Analyzer
+
+Guide for analyzing disk usage across projects in Google Cloud Platform, including disk capacity, disk type distribution, boot vs data disk usage, and storage performance considerations such as IOPS and throughput limits tied to machine types.
+
+## When to Use This Skill
+
+Activate when user asks to:
+- Analyse Disk usage
+- Analyse performance limits (IOPS & Throughput)
+- Analyse performance (IOPS & Throughput) PD vs Hyperdisk
+
+## Ask to provide all the info or specific info
+- Disk info
+- Performance info
+- Performance difference PD vs Hyperdisk
+
+## Disk Inventory Workflow
+
+### Step 1: Identify Projects to Scan
+
+Identify all relevant infrastructure projects first and request approval once for the complete list, rather than requesting approval separately for each project.
+
+**Typical Apollo projects**
+- indigo-lotus-415
+- stage-23704
+- apollo-ops
+- apollo-data-platform-prod
+- databricks-apolloio
+- apollo-cdc
+- apollo-backup-007
+- apollo-secops
+- apollo-keys
+- customer-io-data
+- apollo-email-tracking
+- apollo-devops-scratchpad
+
+Each project must be scanned separately.
+
+**Important Note**: Exclude gke redpanda clusters from apollo-cdc project as they are not managed by apollo infra team.
+
+### Step 2: Discover All Instances and Attached Disks
+
+Run:
+```
+gcloud compute instances list \
+--format="table(
+name:label=INSTANCE,
+disks[].source.basename():label=DISK_NAME,
+disks[].boot:label=IS_BOOT,
+disks[].diskSizeGb:label=SIZE_GB,
+disks[].type.basename():label=DISK_TYPE
+)"
+```
+
+This shows:
+| Field       | Meaning           |
+| ----------- | ----------------- |
+| name        | instance name     |
+| zone        | zone              |
+| machineType | CPU type          |
+| deviceName  | disk device       |
+| boot        | boot or data disk |
+| source      | disk name         |
+
+### Step 3: Retrieve Disk Size and Type
+
+Run:
+```
+gcloud compute disks list \
+--format="table(
+name,
+zone,
+type.basename(),
+sizeGb,
+users.basename()
+)"
+```
+
+This returns:
+| Field  | Meaning             |
+| ------ | ------------------- |
+| name   | disk name           |
+| zone   | disk zone           |
+| type   | disk type           |
+| sizeGb | disk capacity       |
+| users  | instance using disk |
+
+**Disk types include**:
+- pd-standard
+- pd-balanced
+- pd-ssd
+- hyperdisk
+
+### Step 4: Classify Boot vs Data Disks
+
+Boot disk detection:
+```
+disks.boot = True
+```
+
+Example:
+```
+persistent-disk-0 → boot disk
+data-disk → data disk
+```
+
+Report boot and data disks separately.
+
+### Step 5: Detect Component (Workload)
+
+Workload component is derived from instance name patterns.
+
+Typical mapping:
+| Pattern  | Component     |
+| -------- | ------------- |
+| mongo    | MongoDB       |
+| es       | Elasticsearch |
+| redis    | Redis         |
+| gke      | GKE           |
+| kafka    | Kafka         |
+| postgres | Postgres      |
+
+Example:
+```
+staging-es8-main-9 → Elasticsearch
+staging-redis-db-0 → Redis
+gke-prod-nodepool → GKE
+```
+
+### Step 6: Generate Storage Reports
+
+The skill should generate two main reports.
+
+Report 1 — Total Disk Capacity Across Projects
+
+Aggregate storage by disk type and boot/data classification.
+Example output:
+```
+TOTAL DISK CAPACITY ACROSS PROJECTS
+-----------------------------------
+
+Boot Disks
+
+pd-ssd        4 TB
+pd-balanced   1 TB
+hyperdisk     0 TB
+
+Data Disks
+
+pd-ssd        38 TB
+pd-balanced   6 TB
+hyperdisk     3 TB
+
+TOTAL STORAGE
+
+Boot Disk Total:   5 TB
+Data Disk Total:  47 TB
+Overall Total:    52 TB
+```
+
+Report 2 — Disk Usage by Project and Component
+
+Breakdown by:
+- Project
+- Component
+- Disk Type
+- Boot/Data
+
+Example:
+```
+PROJECT: indigo-lotus-415
+
+Component       Disk Type     Boot GB    Data GB
+------------------------------------------------
+MongoDB         pd-ssd        500        9000
+Elasticsearch   pd-ssd        300        12000
+Redis           pd-balanced   100        1000
+GKE             pd-balanced   1500       0
+
+TOTAL                         2400       22000
+```
+
+Repeat for each project.
+
+# Disk Performance (IOPS/Throughput) Analysis
+
+## Disk Performance in GCP Depends On
+
+1. Disk type
+   - pd-standard
+   - pd-balanced
+   - pd-ssd
+   - Hyperdisk
+2. Machine type (CPU)
+   - Each machine type has maximum IOPS and throughput limits
+
+Even if disks support higher performance, machine type limits can throttle throughput or IOPS.
+
+**Required**: GCP does not expose maximum IOPS or throughput limits per machine type through APIs, metrics, or gcloud queries. These limits must be referenced from the official GCP documentation.
+
+- Non Hyperdisk: https://docs.cloud.google.com/compute/docs/disks/performance
+- Hyperdisk: https://docs.cloud.google.com/compute/docs/disks/hd-types/hyperdisk-balanced
+
+If the required limits cannot be retrieved from GCP documentation automatically, Claude should reference the values defined in this skill. If the information is not available here, the user must be asked to provide the limits before continuing.
+
+## Non-Hyperdisk Performance Limits
+
+**IOPS limits for zonal Persistent Disk**
+
+| Metric                  | Zonal Standard PD | Zonal Balanced PD | Zonal SSD PD | Zonal Extreme PD | Zonal SSD PD (multi-writer) |
+| ----------------------- | ----------------- | ----------------- | ------------ | ---------------- | --------------------------- |
+| Read IOPS per GiB       | 0.75              | 6                 | 30           | –                | 30                          |
+| Write IOPS per GiB      | 1.5               | 6                 | 30           | –                | 30                          |
+| Read IOPS per instance  | 7,500             | 80,000            | 100,000      | 120,000          | 100,000                     |
+| Write IOPS per instance | 15,000            | 80,000            | 100,000      | 120,000          | 100,000                     |
+
+**Throughput limits for zonal Persistent Disk**
+
+| Metric                             | Zonal Standard PD | Zonal Balanced PD | Zonal SSD PD | Zonal Extreme PD | Zonal SSD PD (multi-writer) |
+| ---------------------------------- | ----------------- | ----------------- | ------------ | ---------------- | --------------------------- |
+| Throughput per GiB (MiBps)         | 0.12              | 0.28              | 0.48         | —                | 0.48                        |
+| Read throughput per instance (MiBps)  | 1,200          | 1,200             | 1,200        | 4,000*           | 1,200                       |
+| Write throughput per instance (MiBps) | 400            | 1,200             | 1,200        | 3,000*           | 1,200                       |
+
+## Baseline Performance
+
+- Baseline performance is the same for all disk sizes and doesn't scale based on the number of disks of the same type that are attached to an instance
+
+To calculate the maximum expected performance of a Persistent Disk type, use the below formula:
+
+**Formula**
+```
+Maximum expected performance = Baseline performance + (Per GiB performance limit * Combined disk size in GiB)
+```
+
+For example, the maximum IOPS of two 1000 GiB zonal balanced Persistent Disk attached to the same instance is 15,000, which is calculated as follows:
+```
+3,000 baseline performance + (6 IOPS performance limit per GiB * 2000 GiB combined disk size) = 15,000 IOPS
+```
+
+Common machine types currently used with non-Hyperdisk persistent disks (pd-ssd, pd-balanced, pd-standard).
+
+**C3D Instances — pd-balanced**
+
+| Number of vCPUs | Maximum write IOPS | Maximum read IOPS | Maximum write throughput (MiBps) | Maximum read throughput (MiBps) |
+| --------------- | ------------------ | ----------------- | -------------------------------- | ------------------------------- |
+| 4               | 15,000             | 15,000            | 240                              | 240                             |
+| 8               | 25,000             | 25,000            | 800                              | 800                             |
+| 16              | 25,000             | 25,000            | 1,200                            | 1,200                           |
+| 30              | 50,000             | 50,000            | 1,200                            | 1,200                           |
+| 60              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 90              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 180             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 360             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+
+**C3D Instances — pd-ssd**
+
+| Number of vCPUs | Maximum write IOPS | Maximum read IOPS | Maximum write throughput (MiBps) | Maximum read throughput (MiBps) |
+| --------------- | ------------------ | ----------------- | -------------------------------- | ------------------------------- |
+| 4               | 15,000             | 15,000            | 240                              | 240                             |
+| 8               | 15,000             | 15,000            | 800                              | 800                             |
+| 16              | 25,000             | 25,000            | 1,200                            | 1,200                           |
+| 30              | 60,000             | 60,000            | 1,200                            | 1,200                           |
+| 60              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 90              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 180             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 360             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+
+**C3 Instances — pd-balanced**
+
+| Number of vCPUs | Maximum write IOPS | Maximum read IOPS | Maximum write throughput (MiBps) | Maximum read throughput (MiBps) |
+| --------------- | ------------------ | ----------------- | -------------------------------- | ------------------------------- |
+| 4               | 15,000             | 15,000            | 240                              | 240                             |
+| 8               | 15,000             | 15,000            | 240                              | 240                             |
+| 22              | 20,000             | 20,000            | 800                              | 800                             |
+| 44              | 50,000             | 50,000            | 1,200                            | 1,200                           |
+| 88              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 176             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+
+**C3 Instances — pd-ssd**
+
+| Number of vCPUs | Maximum write IOPS | Maximum read IOPS | Maximum write throughput (MiBps) | Maximum read throughput (MiBps) |
+| --------------- | ------------------ | ----------------- | -------------------------------- | ------------------------------- |
+| 4               | 15,000             | 15,000            | 240                              | 240                             |
+| 8               | 15,000             | 15,000            | 240                              | 240                             |
+| 22              | 25,000             | 25,000            | 800                              | 800                             |
+| 44              | 60,000             | 60,000            | 1,200                            | 1,200                           |
+| 88              | 80,000             | 80,000            | 1,200                            | 1,200                           |
+| 176             | 80,000             | 80,000            | 1,200                            | 1,200                           |
+
+## Hyperdisk Performance Limits
+
+To calculate the range of configurable IOPS values for a specific volume size, use these formulas:
+
+- Minimum IOPS: 3,000 IOPS
+- Maximum IOPS: MIN (500x, 160,000) MiB/s, where x is the volume's size
+
+The throughput limit that you specify must be within a range of allowed values. The range depends on the volume's provisioned IOPS. To determine the range of throughput limits for a given IOPS value P, use the following formulas:
+- Minimum throughput: MAX (140, P/256) MiB/s
+- Maximum throughput: MIN (2,400, P/4) MiB/s
+
+**C3 instances**
+
+| Machine Type  | Max IOPS | Max Throughput (MiBps) |
+| ------------- | -------- | ---------------------- |
+| c3-*-4        | 25,000   | 400                    |
+| c3-*-8        | 50,000   | 800                    |
+| c3-*-22       | 120,000  | 1,800                  |
+| c3-*-44       | 160,000  | 2,400                  |
+| c3-*-88       | 160,000  | 4,800                  |
+| c3-*-176      | 160,000  | 10,000                 |
+| c3-*-192      | 160,000  | 10,000                 |
+
+**C3D instances**
+
+| Machine Type  | Max IOPS | Max Throughput (MiBps) |
+| ------------- | -------- | ---------------------- |
+| c3d-*-4       | 25,000   | 400                    |
+| c3d-*-8       | 50,000   | 800                    |
+| c3d-*-16      | 75,000   | 1,200                  |
+| c3d-*-30      | 75,000   | 1,200                  |
+| c3d-*-60      | 160,000  | 2,400                  |
+| c3d-*-90      | 160,000  | 2,400                  |
+| c3d-*-180     | 160,000  | 2,400                  |
+| c3d-*-360     | 160,000  | 2,400                  |
+
+**C4 instances**
+
+| Machine Type      | Max IOPS | Max Throughput (MiBps) |
+| ----------------- | -------- | ---------------------- |
+| c4-*-21           | 50,000   | 400                    |
+| c4-*-41           | 50,000   | 400                    |
+| c4-*-81           | 50,000   | 800                    |
+| c4-*-161          | 100,000  | 1,600                  |
+| c4-*-241          | 100,000  | 1,600                  |
+| c4-*-321          | 100,000  | 1,600                  |
+| c4-*-481          | 160,000  | 2,400                  |
+| c4-*-961          | 240,000  | 4,800                  |
+| c4-*-1441         | 240,000  | 4,800                  |
+| c4-*-1921         | 320,000  | 10,000                 |
+| c4-*-2881         | 320,000  | 10,000                 |
+| c4-*-288-metal1   | 320,000  | 10,000                 |
+
+**C4D instances**
+
+| Machine Type      | Max IOPS | Max Throughput (MiBps) |
+| ----------------- | -------- | ---------------------- |
+| c4d-*-21          | 22,500   | 400                    |
+| c4d-*-41          | 50,000   | 400                    |
+| c4d-*-81          | 50,000   | 800                    |
+| c4d-*-161         | 75,000   | 1,200                  |
+| c4d-*-321         | 75,000   | 1,600                  |
+| c4d-*-481         | 75,000   | 1,600                  |
+| c4d-*-641         | 160,000  | 2,400                  |
+| c4d-*-961         | 160,000  | 2,800                  |
+| c4d-*-1921        | 240,000  | 4,800                  |
+| c4d-*-3841        | 320,000  | 10,000                 |
+| c4d-*-384-metal1  | 320,000  | 10,000                 |
+
+**Note**: Regardless of the calculated disk IOPS or throughput, the effective performance is capped by the VM machine type limits. Disk performance cannot exceed the maximum IOPS or throughput supported by the machine type.
+
+### Step 1: Collect Disk Inventory and Calculate Baseline Performance
+
+Retrieve disk inventory across all approved projects and collect information for all attached disks (boot and data).
+
+For each disk capture the following attributes:
+- Project
+- Instance name
+- Component (derived from instance naming pattern such as MongoDB, Elasticsearch, Redis, GKE, etc.)
+- Machine type
+- Disk name
+- Disk type (pd-ssd, pd-balanced, pd-standard, Hyperdisk)
+- Disk size (GB)
+- Boot or Data disk
+
+Identify all relevant infrastructure projects first and request approval once for the complete list, rather than requesting approval separately for each project.
+
+**Recommended Query**
+```
+gcloud compute instances list \
+--flatten="disks[]" \
+--format="table(
+project,
+name:label=INSTANCE,
+zone,
+machineType.basename():label=MACHINE_TYPE,
+disks.deviceName:label=DEVICE,
+disks.boot:label=BOOT,
+disks.source.basename():label=DISK_NAME
+)"
+```
+
+Once the inventory is collected, group the data by:
+```
+Project → Component → Disk Type
+```
+Then calculate the estimated baseline IOPS and throughput using the disk performance formulas defined earlier in this skill.
+
+#### Report Output Format
+
+The report should provide aggregated totals per project and per component, separated by disk type.
+
+Example:
+
+PROJECT: staging-project
+```
+Component      Disk Type     Disks   Total GB   Est. IOPS   Est. Throughput
+---------------------------------------------------------------------------
+MongoDB        pd-ssd        8       6400       XXXX        XXXX MB/s
+MongoDB        pd-balanced   2       500        XXXX        XXXX MB/s
+
+Elasticsearch  pd-ssd        6       7200       XXXX        XXXX MB/s
+
+Redis          pd-balanced   4       800        XXXX        XXXX MB/s
+
+GKE Nodes      pd-balanced   12      1200       XXXX        XXXX MB/s
+```
+
+#### Project-Level Summary
+
+After the component breakdown, provide a project-wide summary grouped by disk type.
+
+Example:
+
+PROJECT SUMMARY: staging-project
+```
+Disk Type      Total Disks   Total GB   Est. IOPS   Est. Throughput
+-------------------------------------------------------------------
+pd-ssd         14            13600      XXXX        XXXX MB/s
+pd-balanced    18            2500       XXXX        XXXX MB/s
+pd-standard    3             500        XXXX        XXXX MB/s
+```
+
+#### Important Behavior of Persistent Disks
+
+Baseline performance does not scale with the number of disks attached to an instance.
+
+For example:
+```
+Two pd-balanced disks attached to the same VM
+share the same baseline limit of 3,000 IOPS.
+```
+
+### Step 2: Disk Performance Comparison by Disk Type
+
+After calculating disk performance and applying machine-type capped limits, generate a comparison of total IOPS and throughput across disk types.
+
+All values used in this analysis must already be validated against VM machine type limits in Google Cloud Platform.
+
+The comparison must be generated at two levels:
+- Total IOPS and Throughput by Project and Disk Type
+- Project → Component breakdown by Disk Type
+
+Disk types to include:
+- pd-ssd
+- pd-balanced
+- pd-standard
+- hyperdisk
+
+#### Project-Level Disk Performance Summary
+
+Aggregate the total capacity, IOPS, and throughput per disk type for each project.
+
+Example:
+
+PROJECT PERFORMANCE SUMMARY
+Project           Disk Type     Capacity    Total IOPS (Capped)   Total Throughput (Capped)
+--------------------------------------------------------------------------------------------
+indigo-lotus-4215        pd-ssd       14 TB        220,000                3,200 MB/s
+indigo-lotus-4215        pd-balanced  6 TB         60,000                 900 MB/s
+indigo-lotus-4215         pd-standard  1 TB         6,000                  240 MB/s
+indigo-lotus-4215         hyperdisk    4 TB         280,000                4,000 MB/s
+
+stage-23704        pd-ssd       8 TB         140,000                2,000 MB/s
+stage-23704       pd-balanced  3 TB         30,000                 500 MB/s
+stage-23704       pd-standard  500 GB       3,000                  120 MB/s
+stage-23704      hyperdisk    2 TB         160,000                2,600 MB/s
+
+This summary shows the total storage performance distribution per project across disk types.
+
+Project → Component Performance Breakdown
+
+For each project, break down disk performance by component and disk type.
+
+Example:
+
+PROJECT: project-1
+
+Component        Disk Type     Capacity    IOPS (Capped)   Throughput (Capped)
+----------------------------------------------------------------------------
+MongoDB          pd-ssd        6 TB        90,000           1,200 MB/s
+MongoDB          hyperdisk     2 TB        140,000          2,000 MB/s
+
+Elasticsearch    pd-ssd        8 TB        130,000          2,000 MB/s
+Elasticsearch    hyperdisk     2 TB        140,000          2,000 MB/s
+
+Redis            pd-balanced   2 TB        20,000           300 MB/s
+Redis            hyperdisk     1 TB        80,000           1,200 MB/s
+
+#### Purpose of This Step
+This comparison helps identify:
+- performance distribution across disk types
+- workloads benefiting from Hyperdisk
+- components relying heavily on Persistent Disk
+- potential storage modernization opportunities
+
+#### Important Rule
+
+All values used in this comparison must already be validated against the machine type performance limits.
+The comparison must never use theoretical disk performance values that exceed the machine type maximum.
+
+**MANDATORY**: All calculated disk IOPS and throughput must be capped by the VM machine type limits. If disk formulas produce higher values due to large disk sizes, the final reported performance must be limited to the machine type maximum.
+
+# Common Pitfalls
+
+### Missing Data Disks
+
+If disks do not appear in instance output, query disk inventory separately:
+```
+gcloud compute disks list
+```
+
+### GKE Node Boot Disks
+
+Kubernetes nodes also consume boot disks.
+
+These appear as instances starting with:
+```
+gke-
+```
+Include them in storage calculations.
+
+### Unattached Disks
+
+Some disks may not be attached to instances.
+
+These appear with empty users field.
+
+Example:
+```
+users = []
+```
+
+These may represent unused storage cost.
